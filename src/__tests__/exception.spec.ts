@@ -32,7 +32,7 @@ describe("when original ResultException has exception", () => {
         Math.random() > 0.5 ? testResult1 : testException1
       );
       const eHandler = jest.fn(() => testException1);
-      const resultP = target.handle(rHandler, eHandler);
+      const resultP = target.handle<TestResult1, TestException1>(rHandler, eHandler);
 
       expect(eHandler).toHaveBeenCalledTimes(1);
       expect(eHandler).toHaveBeenCalledWith(testException);
@@ -46,7 +46,7 @@ describe("when original ResultException has exception", () => {
     it('should handle => Promise<ResultException<NewResult, NewException>>', async () => {
       const rHandler = jest.fn(() => Promise.resolve(testResult1));
       const eHandler = jest.fn(() => testException1);
-      const resultP = target.handle(rHandler, eHandler);
+      const resultP = target.handle<TestResult1, TestException1>(rHandler, eHandler);
       expect(eHandler).toHaveBeenCalledTimes(1);
       expect(eHandler).toHaveBeenCalledWith(testException);
       expect(rHandler).not.toHaveBeenCalled();
@@ -61,7 +61,7 @@ describe("when original ResultException has exception", () => {
         Promise.resolve(Math.random() > 0.5 ? testResult1 : testException1)
       );
       const eHandler = jest.fn(() => testException1);
-      const resultP = target.handle(rHandler, eHandler);
+      const resultP = target.handle<TestResult1, TestException1>(rHandler, eHandler);
       expect(eHandler).toHaveBeenCalledTimes(1);
       expect(eHandler).toHaveBeenCalledWith(testException);
       expect(rHandler).not.toHaveBeenCalled();
@@ -89,7 +89,7 @@ describe("when original ResultException has exception", () => {
         Math.random() > 0.5 ? testResult1 : testException1
       );
       const eHandler = jest.fn(() => Promise.resolve(testException1));
-      const resultP = target.handle(rHandler, eHandler);
+      const resultP = target.handle<TestResult1, TestException1>(rHandler, eHandler);
       expect(eHandler).toHaveBeenCalledTimes(1);
       expect(eHandler).toHaveBeenCalledWith(testException);
       expect(rHandler).not.toHaveBeenCalled();
@@ -102,7 +102,7 @@ describe("when original ResultException has exception", () => {
     it('should handle => Promise<ResultException<NewResult, NewException>>', async () => {
       const rHandler = jest.fn(() => Promise.resolve(testResult1));
       const eHandler = jest.fn(() => Promise.resolve(testException1));
-      const resultP = target.handle(rHandler, eHandler);
+      const resultP = target.handle<TestResult1, TestException1>(rHandler, eHandler);
       expect(eHandler).toHaveBeenCalledTimes(1);
       expect(eHandler).toHaveBeenCalledWith(testException);
       expect(rHandler).not.toHaveBeenCalled();
@@ -117,7 +117,7 @@ describe("when original ResultException has exception", () => {
         Promise.resolve(Math.random() > 0.5 ? testResult1 : testException1)
       );
       const eHandler = jest.fn(() => Promise.resolve(testException1));
-      const resultP = target.handle(rHandler, eHandler);
+      const resultP = target.handle<TestResult1, TestException1>(rHandler, eHandler);
       expect(eHandler).toHaveBeenCalledTimes(1);
       expect(eHandler).toHaveBeenCalledWith(testException);
       expect(rHandler).not.toHaveBeenCalled();
@@ -201,7 +201,7 @@ describe("when origin ResultException only has result", () => {
     it('should handle => Promise<ResultException<NewResult, NewException>>', async () => {
       const rHandler = jest.fn(() => Promise.resolve(testResult1));
       const eHandler = jest.fn(() => testException1);
-      const result = target.handle(rHandler, eHandler);
+      const result = target.handle<TestResult1, TestException1>(rHandler, eHandler);
       expect(rHandler).toHaveBeenCalledTimes(1);
       expect(rHandler).toHaveBeenCalledWith(testResult);
       expect(eHandler).not.toHaveBeenCalled();
@@ -281,7 +281,7 @@ describe("when origin ResultException only has result", () => {
     });
     it("when rHandler actually returns NewResult", async () => {
       jest.spyOn(Math, "random").mockImplementation(() => 0.6);
-      const resultP = target.handle(rHandler, eHandler);
+      const resultP = target.handle<TestResult1, TestException1>(rHandler, eHandler);
       expect(rHandler).toHaveBeenCalledTimes(1);
       expect(rHandler).toHaveBeenCalledWith(testResult);
       expect(eHandler).not.toHaveBeenCalled();
@@ -292,7 +292,7 @@ describe("when origin ResultException only has result", () => {
 
     it("when rHandler actually returns NewResult", async () => {
       jest.spyOn(Math, "random").mockImplementation(() => 0.4);
-      const resultP = target.handle(rHandler, eHandler);
+      const resultP = target.handle<TestResult1, TestException1>(rHandler, eHandler);
       expect(rHandler).toHaveBeenCalledTimes(1);
       expect(rHandler).toHaveBeenCalledWith(testResult);
       expect(eHandler).not.toHaveBeenCalled();
@@ -311,7 +311,7 @@ describe("when origin ResultException only has result", () => {
     it('should handle => Promise<ResultException<NewResult, NewException>>', async () => {
       const rHandler = jest.fn(() => Promise.resolve(testResult1));
       const eHandler = jest.fn(() => Promise.resolve(testException1));
-      const result = await target.handle(rHandler, eHandler);
+      const result = await target.handle<TestResult1, TestException1>(rHandler, eHandler);
       expect(rHandler).toHaveBeenCalledTimes(1);
       expect(rHandler).toHaveBeenCalledWith(testResult);
       expect(result.getValue()).toBe(testResult1);
