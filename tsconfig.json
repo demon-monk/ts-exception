@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+      "target": "es5",
+      "module": "commonjs",
+      "allowSyntheticDefaultImports": true,
+      "experimentalDecorators": true,
+      "noImplicitAny": false,
+      "esModuleInterop": true,
+      "declaration": true,
+      "outDir": "./lib",
+      "strict": true,
+      "lib": ["es6", "dom"]
+    },
+    "include": ["src/cocos2d/**/*.ts", "typings-cocos2d"],
+    "exclude": ["node_modules", "src/__tests__", "src/test-utils", "src/creator", "src/simulator"]
+  }

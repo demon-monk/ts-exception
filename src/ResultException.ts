@@ -1,106 +1,109 @@
-import { Exception } from "./Exception";
+import { Exception } from './Exception'
 export class ResultException<R, E extends Exception> {
-  constructor(private value: R, private exception: E) {}
-  /**
-   * R: M, M | N, Promise<M>, Promise<M | N>
-   * E: N, Promise<N>
-   */
-  handle<M = R, N extends Exception = E>(
-    rHandler?: (r: R) => M,
-    eHandler?: (e: E) => Promise<N>
-  ): Promise<ResultException<M, N>>;
+  public constructor(private value: R, private exception?: E) {}
 
-  handle<M = R, N extends Exception = E>(
-    rHandler?: (r: R) => Promise<M>,
-    eHandler?: (e: E) => N
-  ): Promise<ResultException<M, N>>;
+  public handle(): Promise<this>
+  // public handle<M>(rHanlder: (result: R) => M): Promise<ResultException<M, E>>
+  public handle<M, N extends Exception>(
+    rHanlder: (result: R) => M | N,
+  ): Promise<ResultException<M, N>>
+  // public handle<M>(rHanlder: (result: R) => Promise<M>): Promise<ResultException<M, E>>
+  public handle<M, N extends Exception>(
+    rHanlder: (result: R) => Promise<M | N>,
+  ): Promise<ResultException<M, N>>
+  // public handle<M>(rHanlder: (result: R) => M, eHandler: (exception: E) => void): Promise<ResultException<M, E>>
+  public handle<M, N extends Exception>(
+    rHanlder: (r: R) => M | N,
+    eHandler: (exception: E) => void,
+  ): Promise<ResultException<M, N>>
+  // public handle<M>(rHandler: (result: R) => Promise<M>, eHandler: (exceptin: E) => void): Promise<ResultException<M, E>>
+  public handle<M, N extends Exception>(
+    rHandler: (result: R) => Promise<M | N>,
+    eHandler: (exception: E) => void,
+  ): Promise<ResultException<M, E>>
+  // public handle<M, N>(rHandler: (result: R) => M, eHandler: (exception: E) => N): Promise<ResultException<M, N>>
+  public handle<M, N extends Exception>(
+    rHandler: (result: R) => M | N,
+    eHandler: (exception: E) => N,
+  ): Promise<ResultException<M, N>>
+  // public handle<M, N>(rHandler: (result: R) => Promise<M>, eHandler: (exception: E) => N): Promise<ResultException<M, N>>
+  public handle<M, N extends Exception>(
+    rHandler: (result: R) => Promise<M | N>,
+    eHandler: (exception: E) => N,
+  ): Promise<ResultException<M, N>>
+  // public handle<M>(rHandler: (result: R) => M, eHandler: (exception: E) => Promise<void>): Promise<ResultException<M, E>>
+  public handle<M, N extends Exception>(
+    rHandler: (result: R) => M | N,
+    eHandler: (exception: E) => Promise<void>,
+  ): Promise<ResultException<M, N>>
+  // public handle<M>(rHandler: (result: R) => Promise<M>, eHandler: (excetion: E) => Promise<void>): Promise<ResultException<M, E>>
+  public handle<M, N extends Exception>(
+    rHandler: (result: R) => Promise<M | N>,
+    eHandler: (exception: E) => Promise<void>,
+  ): Promise<ResultException<M, N>>
+  // public handle<M, N>(rHandler: (result: R) => M, eHanlder: (exception: E) => Promise<N>): Promise<ResultException<M, N>>
+  public handle<M, N extends Exception>(
+    rHandler: (result: R) => M | N,
+    eHandler: (exception: E) => Promise<N>,
+  ): Promise<ResultException<M, N>>
+  // public handle<M, N>(rHandler: (result: R) => Promise<M>, eHandler: (exception: E) => Promise<N>): Promise<ResultException<M, N>>
+  public handle<M, N extends Exception>(
+    rHandler: (result: R) => Promise<M | N>,
+    eHandler: (excception: E) => Promise<N>,
+  ): Promise<ResultException<M, N>>
 
-  // case 1
-  handle<M = R, N extends Exception = E>(
-    rHandler?: (r: R) => Promise<M>,
-    eHandler?: (e: E) => N
-  ): Promise<ResultException<M, N>>;
-
-  handle<M = R, N extends Exception = E>(
-    rHandler?: (r: R) => Promise<M | N>,
-    eHandler?: (e: E) => N
-  ): Promise<ResultException<M, N>>;
-
-  handle<M = R, N extends Exception = E>(
-    rHandler?: (r: R) => M,
-    eHandler?: (e: E) => N
-  ): Promise<ResultException<M, N>>;
-
-  handle<M = R, N extends Exception = E>(
-    rHandler?: (r: R) => M | N,
-    eHandler?: (e: E) => Promise<N>
-  ): Promise<ResultException<M, N>>;
-
-  handle<M = R, N extends Exception = E>(
-    rHandler?: (r: R) => Promise<M>,
-    eHandler?: (e: E) => Promise<N>
-  ): Promise<ResultException<M, N>>;
-
-  handle<M = R, N extends Exception = E>(
-    rHandler?: (r: R) => Promise<M | N>,
-    eHandler?: (e: E) => Promise<N>
-  ): Promise<ResultException<M, N>>;
-
-  handle<M, N extends Exception>(
-    rHandler: (value: R) => R | M | (M | N) | Promise<M> | Promise<M | N> = (
-      value: R
-    ) => this.value,
-    eHandler: (exception: E) => E | N | Promise<N> = (exception: E) =>
-      this.exception
+  public handle<M, N extends Exception>(
+    rHandler?: (result: R) => (M | N) | Promise<M | N>,
+    eHandler?: (exception: E) => N,
   ) {
-    const self = this;
-    let newR = !this.exception ? rHandler(this.value) : undefined;
-    let newE = this.exception ? eHandler(this.exception) : undefined;
-
-    if (!(newR instanceof Promise) && !(newE instanceof Promise)) {
-      return Promise.resolve(
-        newR instanceof Exception
-          ? new ResultException(undefined, newR)
-          : new ResultException(newR, newE)
-      );
+    if (!rHandler && !eHandler) {
+      return Promise.resolve(this)
     }
-    if (newR instanceof Promise && newE instanceof Promise) {
-      return Promise.all([newR, newE]).then(
-        ([resolvedNewR, resolvedNewE]) =>
-          new ResultException(resolvedNewR, resolvedNewE)
-      );
-    }
-    if (newR instanceof Promise) {
-      return newR.then(resolvedR =>
-        resolvedR instanceof Exception
-          ? new ResultException(undefined, resolvedR)
-          : new ResultException(resolvedR, newE)
-      );
-    }
-    if (newE instanceof Promise) {
-      return newE.then(resolvedE => new ResultException(newR, resolvedE));
+    if (this.exception) {
+      if (eHandler) {
+        const newE = eHandler(this.exception)
+        if (newE instanceof Promise) {
+          return newE.then(re => {
+            return new ResultException(undefined, re)
+          })
+        } else {
+          return Promise.resolve(new ResultException(undefined, newE))
+        }
+      } else {
+        return Promise.resolve(new ResultException(undefined, this.exception))
+      }
+    } else {
+      if (rHandler) {
+        const newR = rHandler(this.value)
+        if (newR instanceof Promise) {
+          return newR.then(re => {
+            if (re instanceof Exception) {
+              return new ResultException(void 0, re)
+            } else {
+              return new ResultException(re, void 0)
+            }
+          })
+        } else {
+          const exc = newR instanceof Exception ? newR : void 0
+          const res = exc ? void 0 : newR
+          return Promise.resolve(new ResultException(res, exc))
+        }
+      } else {
+        return Promise.resolve(new ResultException(this.value, void 0))
+      }
     }
   }
 
-  always(f: () => void) {
-    f();
+  public always(f: () => void) {
+    f()
+    return this
   }
 
-  getValue() {
-    return this.value;
+  public getValue() {
+    return this.value
   }
 
-  getException() {
-    return this.exception;
+  public getException() {
+    return this.exception
   }
 }
-
-class TestResult {}
-class TestResult1 {}
-class TestException {}
-class TestException1 {}
-
-const re = new ResultException(new TestResult(), new TestException());
-re.handle().then(re1 => {});
-// test case 1
-// const re1 = re.handle(() => new TestResult1());
